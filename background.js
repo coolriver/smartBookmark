@@ -1,7 +1,8 @@
 
 var contextId,
     requestCur,
-    senderCur;
+    senderCur,
+    sendRequestCur;
 
 function bindEvents() {
     // 响应来自content_script的message
@@ -9,18 +10,22 @@ function bindEvents() {
         if (request.type === 'bookmark-position') {
             console.log('request: ' + JSON.stringify(request));
             console.log('sender: ' + JSON.stringify(sender));
-            console.log('sendRequest: ' + JSON.stringify(sendRequest));
+            console.log('sendRequest: ' + sendRequest);
             requestCur = request;
             senderCur = sender;
+            sendRequestCur = sendRequest;
+            sendRequest(requestCur);
         }
     });
 }
 
 function createMenu() {
     // 添加右键菜单
+    var contexts = ["page","selection","link","editable","image","video",
+        "audio"];
     contextId = chrome.contextMenus.create({
         "title": '保存当前位置到书签',
-        "contexts": ["page"],
+        "contexts": contexts,
         "onclick": menuHandle
     });
 }

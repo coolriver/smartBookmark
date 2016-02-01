@@ -3,10 +3,13 @@
     $tag = null,
     heightTotal = $doc.height();
 
-function insertBookTag(pageX, pageY) {
-    var isFirst = $tag ? false : true;
+function insertBookTag(position) {
+    var isFirst = $tag ? false : true,
+        pageX = position.pageX,
+        pageY = position.pageY;
 
     $tag = $tag ? $tag : $('<div id="book-mark-tag">tag</div>');
+    console.log(pageX, pageY);
     $tag.css({
         top: pageY + 'px',
         left: pageX + 'px'
@@ -23,7 +26,7 @@ function checkBookmark(e) { // 初始化时检测storage中当前页面的书签
     chrome.storage.sync.get(url, function(data) {
         console.log('get: ' + JSON.stringify(data));
         data = data[url];
-        insertBookTag(data.pageX, data.pageY);
+        insertBookTag(data);
         $body.animate({
             scrollTop: data.pageY
         }, 1000);
@@ -40,9 +43,7 @@ function bindEvents() {
                     pageX: e.pageX,
                     pageY: e.pageY,
                     progress: Math.floor(e.pageY * 100 / heightTotal)
-                });
-
-                insertBookTag(e.pageX, e.pageY);
+                }, insertBookTag);
             }
         })
         .on('ready', checkBookmark);
