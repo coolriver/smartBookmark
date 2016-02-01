@@ -1,6 +1,7 @@
 ﻿var $doc = $(document),
     $body = $(document.body),
-    $tag = null;
+    $tag = null,
+    heightTotal = $doc.height();
 
 function insertBookTag(pageX, pageY) {
     var isFirst = $tag ? false : true;
@@ -17,36 +18,34 @@ function insertBookTag(pageX, pageY) {
     }
 }
 
+function checkBookmark(e) { // 初始化时检测storage中当前页面的书签信息
+    var url = location.href;
+    chrome.storage.sync.get(url, function(data) {
+        console.log('get: ' + JSON.stringify(data));
+        data = data[url];
+        insertBookTag(data.pageX, data.pageY);
+        $body.animate({
+            scrollTop: data.pageY
+        }, 1000);
+    });
+}
+
 function bindEvents() {
-    $doc.on('mouseup', function(e) {
+    $doc.on('mouseup', function(e) { // 右键记录当前位置，并发送message给background
             console.log(e.which);
-            chrome.runtime.sendMessage({
-                type: 'mouseup-message',
-                pageX: e.pageX,
-                pageY: e.pageY
-            });
 
-            insertBookTag(e.pageX, e.pageY);
-        })
-        .on('ready', function(e) {
-            if ($tag) { // if book mark tag exist
-                $body.animate({
-                    scrollTop: $tag.css('top')
-                }, 1000);
-            }
-/*            chrome.storage.sync.set({
-                'river': 123123
-            }, function(data) {
-                chrome.storage.sync.get('river', function(data) {
-                    console.log('get: ' + JSON.stringify(data));
+            if (e.which === 3) {
+                chrome.runtime.sendMessage({
+                    type: 'bookmark-position',
+                    pageX: e.pageX,
+                    pageY: e.pageY,
+                    progress: Math.floor(e.pageY * 100 / heightTotal)
                 });
-                console.log('set: ' + JSON.stringify(data));
-            });*/
 
-            chrome.storage.sync.get('river', function(data) {
-                console.log('get: ' + JSON.stringify(data));
-            });
-        });
+                insertBookTag(e.pageX, e.pageY);
+            }
+        })
+        .on('ready', checkBookmark);
 }
 
 function init() {
