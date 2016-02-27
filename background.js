@@ -30,7 +30,7 @@ function createMenu() {
         "audio"
     ];
     contextId = chrome.contextMenus.create({
-        "title": '保存当前位置到书签',
+        "title": 'Set progress tag here',
         "contexts": contexts,
         "onclick": menuHandle
     });
