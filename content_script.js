@@ -1,5 +1,5 @@
 ﻿var $doc = $(document),
-    $body = $(document.body),
+    $body = document.compatMode == "CSS1Compat" ? $('html') : $('body'),
     $tag = null,
     tagStr = '<div id="book-mark-tag">' + 
         '<span class="tag-word">Go on</span>' + 
