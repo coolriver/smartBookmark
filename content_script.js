@@ -1,5 +1,6 @@
 ﻿var $doc = $(document),
-    $body = document.compatMode == "CSS1Compat" ? $('html') : $('body'),
+    $body = $('body'),
+    $scrollElems = [$('body'), $('html')],
     $tag = null,
     tagStr = '<div id="book-mark-tag">' + 
         '<span class="tag-word">Go on</span>' + 
@@ -35,9 +36,16 @@ function checkBookmark(e) { // 初始化时检测storage中当前页面的书签
 
         //console.log('get: ' + JSON.stringify(data));
         insertBookTag(data);
-        $body.animate({
+        $scrollElems[0].animate({
             scrollTop: data.pageY
         }, 1000);
+
+        // body scroll失败，尝试html scroll
+        if ($scrollElems[0].scrollTop() !== data.pageY) {
+            $scrollElems[1].animate({
+                scrollTop: data.pageY
+            }, 1000);
+        }
     });
 }
 
